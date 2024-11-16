@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private TextView[][] cells = new TextView[GRID_SIZE][GRID_SIZE];
+    private int selectedRow = -1;
+    private int selectedCol = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        setUpGridValues();
+        setUpNumberButtons();
+
+    }
+
+    private void setUpGridValues() {
         GridLayout gridLayout = findViewById(R.id.gridLayout);
         int cellSize = getResources().getDisplayMetrics().widthPixels / GRID_SIZE;
 
@@ -52,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView cell = new TextView(this);
                 cell.setLayoutParams(new ViewGroup.LayoutParams(cellSize, cellSize));
                 cell.setGravity(Gravity.CENTER);
-                cell.setTextSize(14);
+                cell.setTextSize(20);
 
                 int cellValue = board[row][col];
                 if (cellValue != 0) {
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onCellClick(int row, int col) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter Number (1-9)");
 
         final EditText input = new EditText(this);
@@ -99,6 +107,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        builder.show();*/
+        selectedRow = row;
+        selectedCol = col;
+        Toast.makeText(this, "Selected cell (" + (row + 1) + ", " + (col + 1) + ")", Toast.LENGTH_SHORT).show();
+    }
+
+    private void setUpNumberButtons() {
+        int[] buttonIds = {
+          R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6, R.id.button7, R.id.button8, R.id.button9
+        };
+
+        for (int i = 0; i < buttonIds.length; i++) {
+            int number = i + 1;
+            findViewById(buttonIds[i]).setOnClickListener(view -> {
+                if (selectedRow != -1 && selectedCol != -1) {
+                    board[selectedRow][selectedCol] = number;
+                    cells[selectedRow][selectedCol].setText(String.valueOf(number));
+                    cells[selectedRow][selectedCol].setTextColor(Color.BLUE);
+                } else {
+                    Toast.makeText(this, "Select a cell first!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
     }
 }

@@ -10,24 +10,31 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
         android:layout_alignParentStart="true"
-        android:gravity="center"
-        android:text="SUDOKU SOLVER"
-        android:textSize="20sp"
-        android:id="@+id/title"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
-        android:textStyle="bold"/>
+        android:gravity="center">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/sudoku_solver"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
 
-
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="@string/bulb_png"
+            android:src="@drawable/light_bulb"
+            android:layout_marginStart="5dp"/>
+    </LinearLayout>
 
     <GridLayout
         android:id="@+id/gridLayout"
@@ -42,6 +49,132 @@
         android:padding="1dp"
         android:background="#000000">
     </GridLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gridLayout"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_1"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button2"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_2"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button3"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_3"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button4"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_4"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button5"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_5"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button6"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_6"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button7"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_7"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button8"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_8"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+
+        <View
+            android:layout_width="5dp"
+            android:layout_height="0dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button9"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/_9"
+            android:textSize="20sp"
+            android:background="@drawable/button_background"/>
+    </LinearLayout>
+
 
 
 </RelativeLayout>
