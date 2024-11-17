@@ -11,5 +11,6 @@
     <string name="_1">1</string>
     <string name="sudoku_solver">SUDOKU</string>
     <string name="bulb_png">bulb_png</string>
+    <string name="level">Lvl :</string>
 
 </resources>

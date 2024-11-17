@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_gravity="center"
     android:background="@color/white"
     tools:context=".MainActivity">
@@ -18,14 +17,16 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
-        android:gravity="center">
+        android:paddingStart="20dp"
+        android:gravity="start">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/sudoku_solver"
-            android:textSize="20sp"
+            android:textSize="25sp"
+            android:layout_gravity="center"
             android:textStyle="bold"/>
 
         <ImageView
@@ -33,8 +34,144 @@
             android:layout_height="30dp"
             android:contentDescription="@string/bulb_png"
             android:src="@drawable/light_bulb"
+            android:layout_gravity="center"
             android:layout_marginStart="5dp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/next_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="12dp"
+            app:cardMaxElevation="5dp"
+            android:backgroundTint="@color/cardview_light_background"
+            android:layout_marginEnd="20dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/baseline_navigate_next_24"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/hint_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="12dp"
+            app:cardMaxElevation="5dp"
+            android:backgroundTint="@color/cardview_light_background"
+            android:layout_marginEnd="20dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/baseline_lightbulb_outline_24"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/undo_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="12dp"
+            app:cardMaxElevation="5dp"
+            android:layout_marginEnd="20dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@drawable/baseline_undo_24"/>
+
+        </androidx.cardview.widget.CardView>
+
+
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/mistake_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/title"
+        android:layout_marginTop="70dp"
+        android:layout_marginStart="10dp"
+        android:text="Mistakes :"
+        android:textSize="16sp" />
+
+
+    <TextView
+        android:id="@+id/mistake_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_marginTop="70dp"
+        android:layout_toRightOf="@id/mistake_text"
+        android:layout_marginStart="5dp"
+        android:text="0 / 3"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/level_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/mistake_count"
+        android:layout_below="@id/title"
+        android:layout_marginTop="70dp"
+        android:layout_marginStart="50dp"
+        android:text="@string/level"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/sudoku_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/level_text"
+        android:layout_below="@id/title"
+        android:layout_marginTop="70dp"
+        android:layout_marginStart="5dp"
+        android:textStyle="bold"
+        android:text="Hard"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/stop_watch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="16sp"
+        android:layout_toStartOf="@id/pause_btn"
+        android:layout_below="@id/title"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="10dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/pause_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:cardCornerRadius="12dp"
+        app:cardMaxElevation="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/title"
+        android:layout_marginTop="65dp"
+        android:backgroundTint="@color/cardview_light_background"
+        android:layout_marginEnd="20dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:src="@drawable/baseline_pause_24"/>
+
+    </androidx.cardview.widget.CardView>
 
     <GridLayout
         android:id="@+id/gridLayout"
@@ -43,7 +180,7 @@
         android:layout_below="@id/title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:rowCount="9"
         android:columnCount="9"
         android:padding="1dp"
@@ -51,11 +188,36 @@
     </GridLayout>
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/gridLayout"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/baseline_lightbulb_outline_24"
+            android:padding="5dp"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:textSize="16sp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/buttonRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/gridLayout"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="60dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="10dp">
