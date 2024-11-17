@@ -16,6 +16,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.sudokugrid.classes.SudokuSolver;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_SIZE = 9; // 9x9 grid
@@ -32,8 +34,10 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private TextView[][] cells = new TextView[GRID_SIZE][GRID_SIZE];
+    private int[][] solvedBoard = new int[GRID_SIZE][GRID_SIZE];
     private int selectedRow = -1;
     private int selectedCol = -1;
+    private int mistakeCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        for (int i = 0; i < GRID_SIZE; i++) {
+            System.arraycopy(board[i], 0, solvedBoard[i], 0,GRID_SIZE);
+        }
+        /// Alternative Method for copying array
+        /*for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                solvedBoard[i][j] = board[i][j];
+            }
+        }*/
+        SudokuSolver.solvedBoard(solvedBoard);
         setUpGridValues();
         setUpNumberButtons();
 
@@ -85,32 +99,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onCellClick(int row, int col) {
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Number (1-9)");
 
-        final EditText input = new EditText(this);
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
+        /*To check whether selected cell is not the one in which you have already entered
+        an input which is incorrect*/
 
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String inputText = input.getText().toString();
-            if (!inputText.isEmpty()) {
-                int number = Integer.parseInt(inputText);
-                if (number >= 1 && number <= 9) {
-                    board[row][col] = number;
-                    cells[row][col].setText(String.valueOf(number));
-                    cells[row][col].setTextColor(Color.BLUE); // Set color for user-entered numbers
-                } else {
-                    Toast.makeText(this, "Please enter a number between 1 and 9", Toast.LENGTH_SHORT).show();
-                }
+        if (selectedRow != -1 && selectedCol != -1) {
+            if (cells[selectedRow][selectedCol].getCurrentTextColor() != Color.WHITE) {
+                cells[selectedRow][selectedCol].setBackgroundResource(R.drawable.cell_border);
             }
-        });
+        }
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();*/
         selectedRow = row;
         selectedCol = col;
-        Toast.makeText(this, "Selected cell (" + (row + 1) + ", " + (col + 1) + ")", Toast.LENGTH_SHORT).show();
+
+        /*To keep the uncorrected cell's background colour as it is even after selecting.
+        It will only change after correct input is entered into it*/
+
+        if (cells[selectedRow][selectedCol].getCurrentTextColor() == Color.WHITE) {
+            cells[selectedRow][selectedCol].setBackgroundColor(Color.RED);
+        } else {
+            // The current selected cell will be indicated in light gray
+            cells[selectedRow][selectedCol].setBackgroundColor(Color.LTGRAY);
+        }
+
+        //Toast.makeText(this, "Selected cell (" + (row + 1) + ", " + (col + 1) + ")", Toast.LENGTH_SHORT).show();
     }
 
     private void setUpNumberButtons() {
@@ -122,9 +134,17 @@ public class MainActivity extends AppCompatActivity {
             int number = i + 1;
             findViewById(buttonIds[i]).setOnClickListener(view -> {
                 if (selectedRow != -1 && selectedCol != -1) {
+                    if (solvedBoard[selectedRow][selectedCol] == number) {
+                        cells[selectedRow][selectedCol].setTextColor(Color.BLUE);
+                        cells[selectedRow][selectedCol].setBackgroundResource(R.drawable.cell_border);
+                    } else {
+                        cells[selectedRow][selectedCol].setTextColor(Color.WHITE);
+                        cells[selectedRow][selectedCol].setBackgroundColor(Color.RED);
+                        mistakeCount += 1;
+                        Toast.makeText(this, "Total Mistake: " + mistakeCount, Toast.LENGTH_SHORT).show();
+                    }
                     board[selectedRow][selectedCol] = number;
                     cells[selectedRow][selectedCol].setText(String.valueOf(number));
-                    cells[selectedRow][selectedCol].setTextColor(Color.BLUE);
                 } else {
                     Toast.makeText(this, "Select a cell first!", Toast.LENGTH_SHORT).show();
                 }
