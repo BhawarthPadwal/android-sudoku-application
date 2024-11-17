@@ -2,21 +2,27 @@ package com.example.sudokugrid;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.sudokugrid.classes.Move;
 import com.example.sudokugrid.classes.SudokuSolver;
+
+import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,9 +41,31 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView[][] cells = new TextView[GRID_SIZE][GRID_SIZE];
     private int[][] solvedBoard = new int[GRID_SIZE][GRID_SIZE];
+    private Stack<Move> moveStack = new Stack<>();
     private int selectedRow = -1;
     private int selectedCol = -1;
     private int mistakeCount = 0;
+    private int hintCount = 3;
+    private CardView undoBtn, hintBtn, pauseBtn;
+    private TextView hintCountTv, mistakesTv, timerTv;
+    ImageView pausePlayIv;
+    private long startTime = 0;
+    private boolean isRunning = false;
+    private long pauseOffset = 0;
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long elapsedMillis = System.currentTimeMillis() - startTime;
+            int seconds = (int) (elapsedMillis / 1000);
+            int minutes = seconds / 60;
+            seconds = seconds % 60;
+            timerTv.setText(String.format("%02d:%02d", minutes, seconds));
+
+            // Run the timer again after 1 second
+            timerHandler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +77,12 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        callAllIds();
+
+        startTimer();
 
         for (int i = 0; i < GRID_SIZE; i++) {
-            System.arraycopy(board[i], 0, solvedBoard[i], 0,GRID_SIZE);
+            System.arraycopy(board[i], 0, solvedBoard[i], 0, GRID_SIZE);
         }
         /// Alternative Method for copying array
         /*for (int i = 0; i < GRID_SIZE; i++) {
@@ -62,6 +93,81 @@ public class MainActivity extends AppCompatActivity {
         SudokuSolver.solvedBoard(solvedBoard);
         setUpGridValues();
         setUpNumberButtons();
+        setUpUndoButton();
+        setUpHintButton();
+        pause_play_timer();
+        /*if (mistakeCount >= 3) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Game Over! You made 3 mistakes.")
+                    .setPositiveButton("Restart", (dialog, id) -> restartGame())
+                    .setNegativeButton("Exit", (dialog, id) -> finish())
+                    .show();
+        }*/
+    }
+
+    private void callAllIds() {
+        undoBtn = findViewById(R.id.undo_btn);
+        hintBtn = findViewById(R.id.hint_btn);
+        pauseBtn = findViewById(R.id.pause_btn);
+        hintCountTv = findViewById(R.id.hint_text);
+        mistakesTv = findViewById(R.id.mistake_count);
+        timerTv = findViewById(R.id.stop_watch);
+        pausePlayIv = findViewById(R.id.pause_play_ic);
+    }
+
+    private void pause_play_timer() {
+        pauseBtn.setOnClickListener(view -> {
+            if (isRunning) {
+                pauseTimer(); // Pause the timer
+                pausePlayIv.setImageResource(R.drawable.baseline_play_arrow_24); // Change to play icon
+            } else {
+                resumeTimer(); // Resume the timer
+                pausePlayIv.setImageResource(R.drawable.baseline_pause_24); // Change to pause icon
+            }
+            isRunning = !isRunning; // Toggle the flag
+        });
+    }
+
+    private void setUpHintButton() {
+        hintBtn.setOnClickListener(view -> {
+            if (selectedRow != -1 && selectedCol != -1) {
+                if (cells[selectedRow][selectedCol].getText().toString().isEmpty()) {
+                    if (hintCount > 0) {
+                        int hintValue = solvedBoard[selectedRow][selectedCol];
+                        board[selectedRow][selectedCol] = hintValue;
+                        cells[selectedRow][selectedCol].setText(String.valueOf(hintValue));
+                        cells[selectedRow][selectedCol].setTextColor(Color.BLUE); // Use blue for hints
+                        cells[selectedRow][selectedCol].setEnabled(false); // Disable editing for hint cells
+                        hintCount -= 1;
+                        hintCountTv.setText(String.valueOf(hintCount));
+                    } else {
+                        Toast.makeText(this, "Oops! you have consumed all your hints!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Please remove entered number first!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Select a cell first!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setUpUndoButton() {
+        undoBtn.setOnClickListener(view -> {
+            if (!moveStack.isEmpty()) {
+                Move lastMove = moveStack.pop();
+                board[lastMove.row][lastMove.col] = lastMove.previousValue;
+                cells[lastMove.row][lastMove.col].setText(lastMove.previousValue == 0 ? "" : String.valueOf(lastMove.previousValue));
+
+                if (lastMove.previousValue == 0 || lastMove.previousValue == solvedBoard[lastMove.row][lastMove.col]) {
+                    cells[selectedRow][selectedCol].setTextColor(Color.BLUE);
+                    cells[selectedRow][selectedCol].setBackgroundResource(R.drawable.cell_border);
+                } else {
+                    cells[selectedRow][selectedCol].setTextColor(Color.WHITE);
+                    cells[selectedRow][selectedCol].setBackgroundColor(Color.RED);
+                }
+            }
+        });
 
     }
 
@@ -127,13 +233,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpNumberButtons() {
         int[] buttonIds = {
-          R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6, R.id.button7, R.id.button8, R.id.button9
+                R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6, R.id.button7, R.id.button8, R.id.button9
         };
 
         for (int i = 0; i < buttonIds.length; i++) {
             int number = i + 1;
             findViewById(buttonIds[i]).setOnClickListener(view -> {
                 if (selectedRow != -1 && selectedCol != -1) {
+                    // To store last move for undo functionality
+                    int previousValue = board[selectedRow][selectedCol];
+                    moveStack.push(new Move(selectedRow, selectedCol, previousValue, number));
                     if (solvedBoard[selectedRow][selectedCol] == number) {
                         cells[selectedRow][selectedCol].setTextColor(Color.BLUE);
                         cells[selectedRow][selectedCol].setBackgroundResource(R.drawable.cell_border);
@@ -141,6 +250,8 @@ public class MainActivity extends AppCompatActivity {
                         cells[selectedRow][selectedCol].setTextColor(Color.WHITE);
                         cells[selectedRow][selectedCol].setBackgroundColor(Color.RED);
                         mistakeCount += 1;
+                        String mistakes = mistakeCount + " / 3";
+                        mistakesTv.setText(mistakes);
                         Toast.makeText(this, "Total Mistake: " + mistakeCount, Toast.LENGTH_SHORT).show();
                     }
                     board[selectedRow][selectedCol] = number;
@@ -152,4 +263,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void startTimer() {
+        startTime = System.currentTimeMillis();
+        isRunning = true;
+        timerHandler.post(timerRunnable);
+    }
+
+    private void stopTimer() {
+        isRunning = false;
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    private void pauseTimer() {
+        pauseOffset = System.currentTimeMillis() - startTime;
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    private void resumeTimer() {
+        startTime = System.currentTimeMillis() - pauseOffset;
+        startTimer();
+    }
+
 }
