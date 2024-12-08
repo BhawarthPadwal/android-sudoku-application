@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SudokuGrid</string>
+    <string name="app_name">MindGrid</string>
     <string name="_8">8</string>
     <string name="_9">9</string>
     <string name="_7">7</string>

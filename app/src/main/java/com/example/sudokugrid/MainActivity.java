@@ -28,6 +28,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_SIZE = 9; // 9x9 grid
     private int[][] board = {
+            {1, 0, 0, 4, 8, 9, 0, 0, 6},
+            {7, 3, 0, 0, 0, 0, 0, 4, 0},
+            {0, 0, 0, 0, 0, 1, 2, 9, 5},
+            {0, 0, 7, 1, 2, 0, 6, 0, 0},
+            {5, 0, 0, 7, 0, 3, 0, 0, 8},
+            {0, 0, 6, 0, 9, 5, 7, 0, 0},
+            {9, 1, 4, 6, 0, 0, 0, 0, 0},
+            {0, 2, 0, 0, 0, 0, 0, 3, 7},
+            {8, 0, 0, 5, 1, 2, 0, 0, 4}
+    };
+
+    /*private int[][] board = {
             {7, 0, 2, 0, 5, 0, 6, 0, 0},
             {0, 0, 0, 0, 0, 3, 0, 0, 0},
             {1, 0, 0, 0, 0, 9, 5, 0, 0},
@@ -37,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             {0, 0, 9, 7, 0, 0, 0, 0, 5},
             {0, 0, 0, 2, 0, 0, 0, 0, 0},
             {0, 0, 7, 0, 4, 0, 2, 0, 3}
-    };
+    };*/
 
     private TextView[][] cells = new TextView[GRID_SIZE][GRID_SIZE];
     private int[][] solvedBoard = new int[GRID_SIZE][GRID_SIZE];
@@ -81,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         startTimer();
 
+
         for (int i = 0; i < GRID_SIZE; i++) {
             System.arraycopy(board[i], 0, solvedBoard[i], 0, GRID_SIZE);
         }
@@ -96,13 +109,13 @@ public class MainActivity extends AppCompatActivity {
         setUpUndoButton();
         setUpHintButton();
         pause_play_timer();
-        /*if (mistakeCount >= 3) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Game Over! You made 3 mistakes.")
-                    .setPositiveButton("Restart", (dialog, id) -> restartGame())
-                    .setNegativeButton("Exit", (dialog, id) -> finish())
-                    .show();
-        }*/
+
+        if (isBoardSolved()) {
+            Toast.makeText(this, "Congratulations! You've solved the Sudoku!", Toast.LENGTH_SHORT).show();
+            clearUserInputs(); // Clear the inputs
+            stopTimer(); // Stop the timer if needed
+        }
+
     }
 
     private void callAllIds() {
@@ -253,9 +266,21 @@ public class MainActivity extends AppCompatActivity {
                         String mistakes = mistakeCount + " / 3";
                         mistakesTv.setText(mistakes);
                         Toast.makeText(this, "Total Mistake: " + mistakeCount, Toast.LENGTH_SHORT).show();
+                        if (mistakeCount >= 3) {
+                            Toast.makeText(this, "Game Over! You made 3 mistakes.", Toast.LENGTH_SHORT).show();
+                            clearUserInputs(); // Clear the inputs
+                            stopTimer(); // Stop the timer if needed
+                        }
                     }
                     board[selectedRow][selectedCol] = number;
                     cells[selectedRow][selectedCol].setText(String.valueOf(number));
+
+                    // Check if the board is solved after the move
+                    if (isBoardSolved()) {
+                        Toast.makeText(this, "Congratulations! You've solved the Sudoku!", Toast.LENGTH_SHORT).show();
+                        clearUserInputs(); // Clear the inputs
+                        stopTimer(); // Stop the timer if needed
+                    }
                 } else {
                     Toast.makeText(this, "Select a cell first!", Toast.LENGTH_SHORT).show();
                 }
@@ -263,6 +288,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private boolean isBoardSolved() {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                if (board[row][col] != solvedBoard[row][col]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void clearUserInputs() {
+        mistakeCount = 0;
+        String mistakes = mistakeCount + " / 3";
+        mistakesTv.setText(mistakes);
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                if (cells[row][col].isEnabled()) {
+                    cells[row][col].setText("");
+                    board[row][col] = 0;
+                    cells[row][col].setBackgroundResource(R.drawable.cell_border);
+                    cells[row][col].setTextColor(Color.BLUE);
+                }
+            }
+        }
+        Toast.makeText(this, "Game reset!", Toast.LENGTH_SHORT).show();
+    }
+
 
     private void startTimer() {
         startTime = System.currentTimeMillis();
